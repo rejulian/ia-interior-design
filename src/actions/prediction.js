@@ -7,7 +7,6 @@ export async function createPrediction(prevState, formData) {
 
   try {
     const imageURL = await uploadImage(formData.get("image"));
-    console.log(imageURL);
 
     let prediction = await fetch("https://api.replicate.com/v1/predictions", {
       headers: {
@@ -39,7 +38,6 @@ export async function createPrediction(prevState, formData) {
       mode: "cors",
       credentials: "include",
     }).then((res) => res.json());
-    console.log(prediction);
 
     while (["starting", "processing"].includes(prediction.status)) {
       prediction = await fetch(

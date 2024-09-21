@@ -1,10 +1,7 @@
 "use client";
-import { createPrediction } from "@/actions/prediction";
-import ImageSkeleton from "@/components/image-skeleton";
-import SubmitButton from "@/components/submit-button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import FormContent from "@/components/form-content";
 import { useFormState } from "react-dom";
+import { createPrediction } from "@/actions/prediction";
 
 export default function Home() {
   const [state, formAction] = useFormState(createPrediction, null);
@@ -15,19 +12,8 @@ export default function Home() {
         AI Interior Design Generator
       </h1>
       <form className="grid gap-4" action={formAction}>
-        <Input type="file" name="image" accept="image/*" />
-        <Textarea placeholder="A tropical bedroom" name="prompt" />
-        <SubmitButton>Generate</SubmitButton>
-        {state?.error && <p className="text-red-500 text-sm">{state.error}</p>}
-        <ImageSkeleton />
+        <FormContent state={state} />
       </form>
-      {state?.output ? (
-        <img
-          className="w-full rounded-lg"
-          src={state.output[1]}
-          alt="Generated image"
-        />
-      ) : null}
     </main>
   );
 }
