@@ -2,7 +2,7 @@
 import { uploadImage } from "@/lib/cloudinary";
 import { unstable_noStore as noStore } from "next/cache";
 
-export async function createPrediction(prevState, formData) {
+export async function createPrediction(formData) {
   noStore();
 
   try {
@@ -39,40 +39,39 @@ export async function createPrediction(prevState, formData) {
       credentials: "include",
     }).then((res) => res.json());
 
-    while (["starting", "processing"].includes(prediction.status)) {
-      prediction = await fetch(
-        `https://api.replicate.com/v1/predictions/${prediction.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.SECRET_TOKEN}`,
-            accept: "*/*",
-            "accept-language": "es-ES,es;q=0.9",
-            "cache-control": "no-cache",
-            pragma: "no-cache",
-            priority: "u=1, i",
-            "sec-ch-ua":
-              '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": '"Windows"',
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-          },
-          referrer:
-            "https://replicate.com/jagilley/controlnet-hough?prediction=fkq7nvsrnxrj00cj235b2mygmw",
-          referrerPolicy: "same-origin",
-          body: null,
-          method: "GET",
-          mode: "cors",
-          credentials: "include",
-        }
-      ).then((res) => res.json());
-
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-    }
-
     return prediction;
   } catch (error) {
+    console.log(error);
+
     return { error: "An error occurred! Please try again later." };
   }
+}
+
+export async function getPrediction(id) {
+  noStore();
+
+  return fetch(`https://api.replicate.com/v1/predictions/${id}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.SECRET_TOKEN}`,
+      accept: "*/*",
+      "accept-language": "es-ES,es;q=0.9",
+      "cache-control": "no-cache",
+      pragma: "no-cache",
+      priority: "u=1, i",
+      "sec-ch-ua":
+        '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+    },
+    referrer:
+      "https://replicate.com/jagilley/controlnet-hough?prediction=fkq7nvsrnxrj00cj235b2mygmw",
+    referrerPolicy: "same-origin",
+    body: null,
+    method: "GET",
+    mode: "cors",
+    credentials: "include",
+  }).then((res) => res.json());
 }

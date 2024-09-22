@@ -1,10 +1,20 @@
 "use client";
 import FormContent from "@/components/form-content";
 import { useFormState } from "react-dom";
-import { createPrediction } from "@/actions/prediction";
+import { createPrediction, getPrediction } from "@/actions/prediction";
 
 export default function Home() {
-  const [state, formAction] = useFormState(createPrediction, null);
+  const [state, formAction] = useFormState(handleSubmit, null);
+
+  async function handleSubmit(_state, formData) {
+    let prediction = await createPrediction(formData);
+    while (["starting", "processing"].includes(prediction.status)) {
+      prediction = await getPrediction(prediction.id);
+
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+    }
+    return prediction;
+  }
 
   return (
     <main className="container max-w-md min-h-[calc(100vh-104px)] m-auto gap-4 px-4 mt-12 sm:px-0">
